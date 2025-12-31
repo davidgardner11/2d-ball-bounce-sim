@@ -26,7 +26,7 @@ void SpatialGrid::insertBall(size_t ballIndex, const Vector2D& position) {
 }
 
 void SpatialGrid::getPotentialCollisions(
-    const std::vector<Ball>& balls,
+    const std::vector<Ball>&,
     std::vector<std::pair<size_t, size_t>>& outPairs)
 {
     outPairs.clear();

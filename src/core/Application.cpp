@@ -139,24 +139,24 @@ void Application::renderBalls() {
 }
 
 void Application::renderUI() {
-    // Render FPS
-    textRenderer.renderFPS(
+    // Render FPS (cached)
+    textRenderer.renderFPSCached(
         renderer.getSDLRenderer(),
         time.getFPS(),
         Config::FPS_DISPLAY_X,
         Config::FPS_DISPLAY_Y
     );
 
-    // Render ball count
-    textRenderer.renderBallCount(
+    // Render ball count (cached)
+    textRenderer.renderBallCountCached(
         renderer.getSDLRenderer(),
         gameState.getBallCount(),
         Config::BALL_COUNT_X,
         Config::BALL_COUNT_Y
     );
 
-    // Render timer
-    textRenderer.renderTimer(
+    // Render timer (cached)
+    textRenderer.renderTimerCached(
         renderer.getSDLRenderer(),
         time.getElapsedTime(),
         Config::TIMER_DISPLAY_X,
