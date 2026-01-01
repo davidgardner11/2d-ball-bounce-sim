@@ -8,6 +8,12 @@ TextRenderer::TextRenderer()
     : font(nullptr)
     , fontSize(Config::UI_FONT_SIZE)
     , initialized(false)
+    , fpsCachedTexture(nullptr)
+    , lastFPS(-1.0f)
+    , ballCountCachedTexture(nullptr)
+    , lastBallCount(0)
+    , timerCachedTexture(nullptr)
+    , lastTimerSeconds(-1)
 {
 }
 
@@ -53,6 +59,19 @@ bool TextRenderer::initialize() {
 }
 
 void TextRenderer::cleanup() {
+    if (fpsCachedTexture) {
+        SDL_DestroyTexture(fpsCachedTexture);
+        fpsCachedTexture = nullptr;
+    }
+    if (ballCountCachedTexture) {
+        SDL_DestroyTexture(ballCountCachedTexture);
+        ballCountCachedTexture = nullptr;
+    }
+    if (timerCachedTexture) {
+        SDL_DestroyTexture(timerCachedTexture);
+        timerCachedTexture = nullptr;
+    }
+
     if (font) {
         TTF_CloseFont(font);
         font = nullptr;
