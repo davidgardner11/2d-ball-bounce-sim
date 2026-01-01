@@ -97,4 +97,4 @@ marble-bouncing/
 
 ## License
 
-This project is provided as-is for educational purposes.
+This project is provided as-is for educational purposes. 
