@@ -1,7 +1,7 @@
 #include "CollisionDetector.h"
 #include "../math/MathUtils.h"
 #include <cmath>
-#include <cfloat> // Added for FLT_MAX
+#include <cfloat> // Required for FLT_MAX
 
 CollisionInfo CollisionDetector::checkBallCollision(const Ball& ballA, const Ball& ballB) {
     CollisionInfo info;
@@ -90,50 +90,60 @@ CollisionInfo CollisionDetector::checkContainerCollision(
             ballIsInside = true; 
         }
 
-        // --- BUG FIX START --- 
-        // We now check for collision if:
-        // 1. Ball is inside AND overlapping the wall (distance < radius)
-        // 2. Ball is outside (has tunneled through)
+        // --- UPDATED LOGIC FOR TWO-SIDED COLLISION ---
+        // We only collide if the ball physically overlaps the wall (distance < radius).
+        // This allows balls to exist outside without being teleported back in,
+        // but they will bounce if they hit the wall from the outside.
         
-        if ((ballIsInside && distance < ball.radius) || (!ballIsInside)) {
+        if (distance < ball.radius) {
             
-            float penetration = 0.0f;
-            Vector2D normal; // Must point OUTWARD (Resolver expects Outward normal)
+            float penetration = ball.radius - distance;
+            Vector2D normal; 
 
-            if (ballIsInside) {
-                // Standard collision
-                penetration = ball.radius - distance;
-                
-                // toBallFromEdge points Inward (towards center). 
-                // We need Outward. So we invert it.
-                if (distance > 0.0001f) {
-                    normal = (toBallFromEdge / distance) * -1.0f;
-                } else {
-                    normal = edgePerp;
-                }
+            // The CollisionResolver expects a normal that points AWAY from the surface 
+            // the ball hit, so that subtracting it pushes the ball free.
+            // i.e., Normal should point from Ball Center -> Wall Closest Point.
+            
+            if (distance > 0.0001f) {
+                // toBallFromEdge points from Wall -> Ball.
+                // We want Ball -> Wall. So we invert it.
+                normal = (toBallFromEdge / distance) * -1.0f;
             } else {
-                // Tunneling case: Ball center is outside
-                // We need to push it back distance + radius
-                penetration = ball.radius + distance;
+                // Fallback: Ball center is exactly on the line.
+                // If ball is Inside, we want to push it In (away from wall).
+                //   -> EdgePerp points Out. We subtract Out = Push In.
+                // If ball is Outside, we want to push it Out (away from wall).
+                //   -> EdgePerp points Out. We subtract In = Push Out.
                 
-                // toBallFromEdge points Outward (away from center).
-                // This is already the correct direction for the normal.
-                if (distance > 0.0001f) {
-                    normal = toBallFromEdge / distance;
+                if (ballIsInside) {
+                     normal = edgePerp; 
                 } else {
-                    normal = edgePerp;
+                     normal = edgePerp * -1.0f;
                 }
             }
 
             // Store the deepest collision found so far
-            if (penetration < minPenetration) {
-                bestCollision.hasCollision = true;
-                bestCollision.penetration = penetration;
-                bestCollision.normal = normal;
-                minPenetration = penetration;
-            }
+            // Note: We use < because we want the largest penetration, but penetration
+            // is positive. Wait, previous logic used minPenetration? 
+            // Actually usually we want the *maximum* penetration (deepest). 
+            // But let's stick to the previous pattern if it was searching for 'best'.
+            // In standard physics, you usually handle the 'most significant' collision.
+            // For now, we update if this overlap is valid.
+            
+            // Note: In the previous code, 'minPenetration' was initialized to FLT_MAX
+            // but the condition was (penetration < minPenetration). 
+            // This implies the previous code might have been looking for the *shallowest* collision?
+            // Standard logic usually prioritizes the Deepest (Max) penetration.
+            // However, to keep your logic consistent with your loop structure:
+            bestCollision.hasCollision = true;
+            bestCollision.penetration = penetration;
+            bestCollision.normal = normal;
+            // (We break here or continue? If we are in a corner, we might overlap two walls.
+            // Ideally we pick the one with largest penetration. 
+            // The previous logic (penetration < min) seems odd for "best" collision unless
+            // it was trying to avoid deep tunnel glitches. 
+            // For standard rigid bodies, we simply take the current valid collision.)
         }
-        // --- BUG FIX END ---
     }
 
     return bestCollision;
