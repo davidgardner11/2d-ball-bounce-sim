@@ -31,6 +31,7 @@ set(SOURCES
     src/rendering/CircleRenderer.cpp
     src/rendering/CircleTextureCache.cpp
     src/rendering/TextRenderer.cpp
+    src/rendering/ShapeRenderer.cpp
     src/ui/Slider.cpp
     src/ui/Button.cpp
     src/core/Application.cpp

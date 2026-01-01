@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Config.h"
 #include "../math/MathUtils.h"
+#include "../rendering/ShapeRenderer.h"
 #include <iostream>
 
 Application::Application()
@@ -151,8 +152,9 @@ void Application::update(float deltaTime) {
 
     // Update configurable parameters
     gameState.getBallManager().setBallRadius(ballRadius);
-    gameState.getContainer().setGapAngleDegrees(holeSize);
-    gameState.getContainer().setRadius(containerDiameter / 2.0f);
+    // Hole size slider is disconnected for now (gap size is fixed at 25%)
+    // gameState.getContainer().setGapAngleDegrees(holeSize);
+    gameState.getContainer().setSideLength(containerDiameter);  // Use diameter as side length
     gameState.getPhysics().setGravity(gravity * 100.0f); // Convert m/s² to px/s²
 
     // Handle fractional respawn rate with debt accumulation
@@ -203,25 +205,40 @@ void Application::render() {
 void Application::renderContainer() {
     const Container& container = gameState.getContainer();
 
-    Vector2D center = container.getCenter();
-    float radius = container.getRadius();
-    float gapStart = container.getGapStartAngle();
-    float gapEnd = container.getGapEndAngle();
+    // Get the edges and gap boundaries for the square
+    auto edges = container.getWorldEdges();
+    Vector2D gapStart, gapEnd;
+    container.getGapBoundaries(gapStart, gapEnd);
 
-    // Draw the container as an arc (excluding the gap)
-    // We need to draw from gapEnd to gapStart (the complement of the gap)
-    float arcStart = gapEnd;
-    float arcEnd = gapStart + MathUtils::TWO_PI;
-
-    circleRenderer.drawArc(
-        renderer.getSDLRenderer(),
-        center,
-        radius,
-        arcStart,
-        arcEnd,
-        Config::CONTAINER_COLOR,
-        3  // thickness
-    );
+    // Draw each edge
+    for (const auto& edge : edges) {
+        if (edge.hasGap) {
+            // Draw two segments: start→gapStart and gapEnd→end
+            ShapeRenderer::drawThickLine(
+                renderer.getSDLRenderer(),
+                edge.start,
+                gapStart,
+                Config::CONTAINER_COLOR,
+                3
+            );
+            ShapeRenderer::drawThickLine(
+                renderer.getSDLRenderer(),
+                gapEnd,
+                edge.end,
+                Config::CONTAINER_COLOR,
+                3
+            );
+        } else {
+            // Draw full edge
+            ShapeRenderer::drawThickLine(
+                renderer.getSDLRenderer(),
+                edge.start,
+                edge.end,
+                Config::CONTAINER_COLOR,
+                3
+            );
+        }
+    }
 }
 
 void Application::renderBalls() {

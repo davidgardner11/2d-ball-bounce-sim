@@ -8,8 +8,9 @@ GameState::GameState()
     )
     , container(
         Vector2D(Config::CONTAINER_CENTER_X, Config::CONTAINER_CENTER_Y),
-        Config::CONTAINER_RADIUS,
-        Config::CONTAINER_GAP_PERCENT * 360.0f  // Convert to degrees
+        Config::CONTAINER_RADIUS * 2.0f,  // Use diameter as side length (600px)
+        0.25f,                             // Gap is 25% of side length
+        0                                  // Gap on side 0 (right side in local coords)
     )
     , physics(Config::GRAVITY)
 {
