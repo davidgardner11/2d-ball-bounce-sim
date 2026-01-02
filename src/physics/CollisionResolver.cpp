@@ -52,13 +52,16 @@ void CollisionResolver::resolveWallCollision(Ball& ball, const CollisionInfo& in
         return;
     }
 
-    // Get collision normal (points outward from container center)
+    // Get collision normal
     Vector2D normal = info.normal;
 
     // Calculate velocity along the normal
     float velocityAlongNormal = ball.velocity.dot(normal);
 
     // Don't resolve if ball is moving away from wall
+    // For inner wall: normal points outward, so velocityAlongNormal > 0 means moving out (colliding)
+    // For outer wall: normal points inward, so velocityAlongNormal < 0 means moving in (colliding)
+    // In both cases, we want to resolve when velocity opposes the escape direction
     if (velocityAlongNormal < 0.0f) {
         return;
     }
@@ -66,7 +69,7 @@ void CollisionResolver::resolveWallCollision(Ball& ball, const CollisionInfo& in
     // Reflect velocity across normal with restitution
     ball.velocity -= normal * (2.0f * velocityAlongNormal * restitution);
 
-    // Position correction: push ball back inside container
+    // Position correction: move ball along normal to resolve penetration
     ball.position -= normal * info.penetration;
 }
 
