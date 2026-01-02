@@ -26,17 +26,17 @@ void Ball::applyGravity(float gravity, float deltaTime) {
 }
 
 bool Ball::isOffScreen(float screenWidth, float screenHeight) const {
-    // Check if ball has exited through any edge
-    // Top edge
-    if (position.y + radius < 0) return true;
+    // Check if ball has completely exited through any edge
+    // Top edge (top of ball above screen)
+    if (position.y - radius < 0) return true;
 
-    // Bottom edge
-    if (position.y - radius > screenHeight) return true;
+    // Bottom edge (bottom of ball below screen)
+    if (position.y + radius > screenHeight) return true;
 
-    // Left edge
+    // Left edge (right side of ball left of screen)
     if (position.x + radius < 0) return true;
 
-    // Right edge
+    // Right edge (left side of ball right of screen)
     if (position.x - radius > screenWidth) return true;
 
     return false;

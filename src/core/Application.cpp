@@ -5,7 +5,7 @@
 
 Application::Application()
     : renderer(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT, Config::WINDOW_TITLE)
-    , bouncinessSlider(Config::SLIDER_X, Config::SLIDER_Y, Config::SLIDER_WIDTH, Config::SLIDER_HEIGHT, 0.8f, 1.2f, Config::RESTITUTION)
+    , bouncinessSlider(Config::SLIDER_X, Config::SLIDER_Y, Config::SLIDER_WIDTH, Config::SLIDER_HEIGHT, 0.95f, 1.05f, Config::RESTITUTION)
     , ballSizeSlider(Config::SIZE_SLIDER_X, Config::SIZE_SLIDER_Y, Config::SIZE_SLIDER_WIDTH, Config::SIZE_SLIDER_HEIGHT, 5.0f, 25.0f, Config::BALL_RADIUS)
     , holeSizeSlider(Config::HOLE_SLIDER_X, Config::HOLE_SLIDER_Y, Config::HOLE_SLIDER_WIDTH, Config::HOLE_SLIDER_HEIGHT, 0.0f, 180.0f, Config::CONTAINER_GAP_PERCENT * 360.0f)
     , respawnCountSlider(Config::RESPAWN_SLIDER_X, Config::RESPAWN_SLIDER_Y, Config::RESPAWN_SLIDER_WIDTH, Config::RESPAWN_SLIDER_HEIGHT, 0.1f, 10.0f, 2.0f)
@@ -19,7 +19,6 @@ Application::Application()
     , respawnRate(2.0f)
     , gravity(9.8f)
     , containerDiameter(Config::CONTAINER_RADIUS * 2.0f)
-    , ballDebt(0.0f)
     , running(false)
     , paused(false)
     , accumulator(0.0f)
@@ -155,35 +154,13 @@ void Application::update(float deltaTime) {
     gameState.getContainer().setRadius(containerDiameter / 2.0f);
     gameState.getPhysics().setGravity(gravity * 100.0f); // Convert m/s² to px/s²
 
-    // Handle fractional respawn rate with debt accumulation
-    // Get current ball count before update
-    size_t ballsBefore = gameState.getBallCount();
-
-    // Update game state (this removes off-screen balls)
-    gameState.update(deltaTime, restitution, 0); // Pass 0 to prevent auto-respawn
-
-    // Calculate how many balls were removed
-    size_t ballsAfter = gameState.getBallCount();
-    int ballsRemoved = static_cast<int>(ballsBefore - ballsAfter);
-
-    if (ballsRemoved > 0) {
-        // Add fractional balls to debt
-        ballDebt += ballsRemoved * respawnRate;
-
-        // Spawn whole balls from debt
-        int ballsToSpawn = static_cast<int>(ballDebt);
-        if (ballsToSpawn > 0) {
-            for (int i = 0; i < ballsToSpawn; ++i) {
-                gameState.getBallManager().spawnInitialBall();
-            }
-            ballDebt -= ballsToSpawn;
-        }
-    }
+    // Update game state with respawn rate (BallManager handles queuing and safe spawning)
+    int respawnCount = static_cast<int>(respawnRate);
+    gameState.update(deltaTime, restitution, respawnCount);
 
     // Ensure at least one ball exists to keep simulation running
-    if (gameState.getBallCount() == 0) {
+    if (gameState.getBallCount() == 0 && gameState.getPendingRespawnCount() == 0) {
         gameState.getBallManager().spawnInitialBall();
-        ballDebt = 0.0f; // Reset debt when respawning safety ball
     }
 }
 
@@ -282,6 +259,14 @@ void Application::renderUI() {
         Config::TIMER_DISPLAY_Y
     );
 
+    // Render pending respawn count (cached)
+    textRenderer.renderPendingRespawnCached(
+        renderer.getSDLRenderer(),
+        gameState.getPendingRespawnCount(),
+        Config::PENDING_RESPAWN_X,
+        Config::PENDING_RESPAWN_Y
+    );
+
     // Render bounciness slider
     bouncinessSlider.render(renderer.getSDLRenderer(), "Bounciness");
 
@@ -363,7 +348,7 @@ void Application::renderUI() {
 
     // Render diameter label and value
     char diameterLabel[64];
-    snprintf(diameterLabel, sizeof(diameterLabel), "Diameter: %.0fpx", containerDiameter);
+    snprintf(diameterLabel, sizeof(diameterLabel), "Cont Diameter: %.0fpx", containerDiameter);
     textRenderer.renderText(
         renderer.getSDLRenderer(),
         diameterLabel,

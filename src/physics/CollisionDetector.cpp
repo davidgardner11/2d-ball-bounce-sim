@@ -32,24 +32,37 @@ CollisionInfo CollisionDetector::checkContainerCollision(
     Vector2D delta = ball.position - container.getCenter();
     float distance = delta.magnitude();
 
-    // Check if ball is outside container bounds
+    // Calculate the collision angle
+    float angle = std::atan2(delta.y, delta.x);
+    angle = MathUtils::normalizeAngle(angle);
+
+    // Get gap boundaries
+    float gapStart = container.getGapStartAngle();
+    float gapEnd = container.getGapEndAngle();
+    bool isInGap = MathUtils::isAngleInRange(angle, gapStart, gapEnd);
+
+    // Skip collision if in gap area
+    if (isInGap) {
+        return info;
+    }
+
+    // Determine which side of the container the ball is on
     float containerInnerRadius = container.getRadius() - ball.radius;
+    float containerOuterRadius = container.getRadius() + ball.radius;
 
-    if (distance > containerInnerRadius) {
-        // Ball is outside container, check if it's hitting the wall or in the gap
-        float angle = std::atan2(delta.y, delta.x);
-        angle = MathUtils::normalizeAngle(angle);
-
-        // Check if collision point is in the gap
-        float gapStart = container.getGapStartAngle();
-        float gapEnd = container.getGapEndAngle();
-
-        if (!MathUtils::isAngleInRange(angle, gapStart, gapEnd)) {
-            // Not in gap, so there's a collision with the container wall
-            info.hasCollision = true;
-            info.normal = delta.normalized();  // Normal points outward from center
-            info.penetration = distance - containerInnerRadius;
-        }
+    // Check for collision with inner wall (ball pushing out from inside)
+    if (distance > containerInnerRadius && distance <= container.getRadius()) {
+        // Ball is penetrating inner wall from inside
+        info.hasCollision = true;
+        info.normal = delta.normalized();  // Normal points outward from center
+        info.penetration = distance - containerInnerRadius;
+    }
+    // Check for collision with outer wall (ball bouncing off from outside)
+    else if (distance > container.getRadius() && distance < containerOuterRadius) {
+        // Ball is penetrating outer wall from outside
+        info.hasCollision = true;
+        info.normal = delta.normalized() * -1.0f;  // Normal points inward toward center
+        info.penetration = containerOuterRadius - distance;
     }
 
     return info;

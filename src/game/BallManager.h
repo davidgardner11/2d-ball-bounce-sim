@@ -20,6 +20,7 @@ public:
 
     // Stats
     size_t getBallCount() const { return balls.size(); }
+    size_t getPendingRespawnCount() const { return pendingRespawnCount; }
 
     // Configuration
     void setBallRadius(float radius) { ballRadius = radius; }
@@ -28,11 +29,15 @@ private:
     std::vector<Ball> balls;
     Vector2D spawnCenter;
     float ballRadius;
+    size_t pendingRespawnCount;
 
     // Spawning helpers
     Ball createRandomBall(const Vector2D& position);
     Vector2D getRandomVelocity() const;
     SDL_Color getRandomColor() const;
+
+    // Check if a position would collide with existing balls
+    bool wouldCollideWithBalls(const Vector2D& position) const;
 
     // Remove balls that fell off screen
     void removeOffScreenBalls(float screenHeight);

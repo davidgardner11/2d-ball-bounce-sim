@@ -34,6 +34,7 @@ public:
     void renderFPSCached(SDL_Renderer* renderer, float fps, int x, int y);
     void renderBallCountCached(SDL_Renderer* renderer, size_t count, int x, int y);
     void renderTimerCached(SDL_Renderer* renderer, float elapsedTime, int x, int y);
+    void renderPendingRespawnCached(SDL_Renderer* renderer, size_t count, int x, int y);
 
 private:
     TTF_Font* font;
@@ -49,6 +50,9 @@ private:
 
     SDL_Texture* timerCachedTexture;
     int lastTimerSeconds;
+
+    SDL_Texture* pendingRespawnCachedTexture;
+    size_t lastPendingRespawnCount;
 
     void renderCachedTexture(
         SDL_Renderer* renderer,

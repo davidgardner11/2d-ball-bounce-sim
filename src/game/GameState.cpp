@@ -38,3 +38,7 @@ void GameState::update(float deltaTime, float restitution, int respawnCount) {
 size_t GameState::getBallCount() const {
     return ballManager.getBallCount();
 }
+
+size_t GameState::getPendingRespawnCount() const {
+    return ballManager.getPendingRespawnCount();
+}

@@ -1,4 +1,4 @@
-# Marble Bouncing Simulator
+# Ball Bouncing Simulator
 
 A 2D physics simulator built with C++ and SDL2 featuring balls bouncing inside a rotating circular container with realistic elastic collisions and gravity.
 
@@ -34,7 +34,7 @@ cmake ..
 cmake --build .
 
 # Run the simulator
-./MarbleBouncing
+./BallBouncing
 ```
 
 ### Linux
@@ -47,7 +47,7 @@ sudo apt-get install cmake libsdl2-dev libsdl2-ttf-dev
 mkdir build && cd build
 cmake ..
 cmake --build .
-./MarbleBouncing
+./BallBouncing
 ```
 
 ## Controls
@@ -75,7 +75,7 @@ cmake --build .
 ## Project Structure
 
 ```
-marble-bouncing/
+Ball-bouncing/
 ├── CMakeLists.txt
 ├── README.md
 └── src/
@@ -97,4 +97,4 @@ marble-bouncing/
 
 ## License
 
-This project is provided as-is for educational purposes.
+This project is provided as-is for educational purposes. 
