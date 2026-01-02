@@ -14,6 +14,8 @@ TextRenderer::TextRenderer()
     , lastBallCount(0)
     , timerCachedTexture(nullptr)
     , lastTimerSeconds(-1)
+    , pendingRespawnCachedTexture(nullptr)
+    , lastPendingRespawnCount(0)
 {
 }
 
@@ -70,6 +72,10 @@ void TextRenderer::cleanup() {
     if (timerCachedTexture) {
         SDL_DestroyTexture(timerCachedTexture);
         timerCachedTexture = nullptr;
+    }
+    if (pendingRespawnCachedTexture) {
+        SDL_DestroyTexture(pendingRespawnCachedTexture);
+        pendingRespawnCachedTexture = nullptr;
     }
 
     if (font) {
@@ -129,7 +135,7 @@ void TextRenderer::renderBallCount(SDL_Renderer* renderer, size_t count, int x, 
 }
 
 void TextRenderer::renderTimer(SDL_Renderer* renderer, float elapsedTime, int x, int y) {
-    // Format time as MM:SS.ms
+    // Format time as MM:SS.mm
     int minutes = static_cast<int>(elapsedTime) / 60;
     int seconds = static_cast<int>(elapsedTime) % 60;
     int milliseconds = static_cast<int>((elapsedTime - static_cast<int>(elapsedTime)) * 100);
@@ -199,6 +205,22 @@ void TextRenderer::renderTimerCached(SDL_Renderer* renderer, float elapsedTime, 
         << std::setfill('0') << std::setw(2) << seconds << "."
         << std::setfill('0') << std::setw(2) << milliseconds;
     renderCachedTexture(renderer, &timerCachedTexture, oss.str(), x, y);
+}
+
+void TextRenderer::renderPendingRespawnCached(SDL_Renderer* renderer, size_t count, int x, int y) {
+    if (count == lastPendingRespawnCount && pendingRespawnCachedTexture) {
+        SDL_Rect destRect;
+        SDL_QueryTexture(pendingRespawnCachedTexture, nullptr, nullptr, &destRect.w, &destRect.h);
+        destRect.x = x;
+        destRect.y = y;
+        SDL_RenderCopy(renderer, pendingRespawnCachedTexture, nullptr, &destRect);
+        return;
+    }
+
+    lastPendingRespawnCount = count;
+    std::ostringstream oss;
+    oss << "Respawn Count: " << count;
+    renderCachedTexture(renderer, &pendingRespawnCachedTexture, oss.str(), x, y);
 }
 
 void TextRenderer::renderCachedTexture(

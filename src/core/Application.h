@@ -40,7 +40,6 @@ private:
     float respawnRate;
     float gravity;
     float containerDiameter;
-    float ballDebt;  // Accumulated fractional balls for negative respawning
 
     bool running;
     bool paused;

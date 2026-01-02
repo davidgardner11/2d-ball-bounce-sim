@@ -6,7 +6,7 @@ namespace Config {
     // Window settings
     constexpr int WINDOW_WIDTH = 1024;
     constexpr int WINDOW_HEIGHT = 768;
-    constexpr const char* WINDOW_TITLE = "Marble Bouncing Simulator";
+    constexpr const char* WINDOW_TITLE = "Ball Bouncing Simulator";
 
     // Container settings
     constexpr float CONTAINER_RADIUS = 300.0f;  // 600px diameter
@@ -37,6 +37,8 @@ namespace Config {
     constexpr int FPS_DISPLAY_Y = 10;
     constexpr int BALL_COUNT_X = 10;
     constexpr int BALL_COUNT_Y = 40;
+    constexpr int PENDING_RESPAWN_X = 10;
+    constexpr int PENDING_RESPAWN_Y = 180;
     constexpr int TIMER_DISPLAY_X = 10;
     constexpr int TIMER_DISPLAY_Y = 70;
     constexpr int UI_FONT_SIZE = 20;
