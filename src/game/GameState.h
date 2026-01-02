@@ -21,6 +21,7 @@ public:
 
     // Stats
     size_t getBallCount() const;
+    size_t getPendingRespawnCount() const;
 
 private:
     BallManager ballManager;

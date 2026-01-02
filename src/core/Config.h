@@ -37,6 +37,8 @@ namespace Config {
     constexpr int FPS_DISPLAY_Y = 10;
     constexpr int BALL_COUNT_X = 10;
     constexpr int BALL_COUNT_Y = 40;
+    constexpr int PENDING_RESPAWN_X = 10;
+    constexpr int PENDING_RESPAWN_Y = 180;
     constexpr int TIMER_DISPLAY_X = 10;
     constexpr int TIMER_DISPLAY_Y = 70;
     constexpr int UI_FONT_SIZE = 20;
