@@ -1,4 +1,4 @@
-# Marble Bouncing - Project Memory
+# Ball Bouncing - Project Memory
 
 ## Project Overview
 
@@ -20,7 +20,7 @@ brew install cmake sdl2 sdl2_ttf
 mkdir build && cd build
 cmake ..
 cmake --build .
-./MarbleBouncing
+./BallBouncing
 ```
 
 ### Linux (Ubuntu/Debian)
@@ -29,7 +29,7 @@ sudo apt-get install cmake libsdl2-dev libsdl2-ttf-dev
 mkdir build && cd build
 cmake ..
 cmake --build .
-./MarbleBouncing
+./BallBouncing
 ```
 
 ### Rebuild after changes

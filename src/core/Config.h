@@ -6,7 +6,7 @@ namespace Config {
     // Window settings
     constexpr int WINDOW_WIDTH = 1024;
     constexpr int WINDOW_HEIGHT = 768;
-    constexpr const char* WINDOW_TITLE = "Marble Bouncing Simulator";
+    constexpr const char* WINDOW_TITLE = "Ball Bouncing Simulator";
 
     // Container settings
     constexpr float CONTAINER_RADIUS = 300.0f;  // 600px diameter

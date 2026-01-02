@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "Marble Bouncing Simulator" << std::endl;
+    std::cout << "Ball Bouncing Simulator" << std::endl;
     std::cout << "Press ESC to quit" << std::endl;
 
     app.run();
